@@ -67,7 +67,7 @@ object OrderConnectAndCheck {
   class OrderMatchReceipt extends CoProcessFunction[OrderEvent, ReceiptEvent, (OrderEvent, ReceiptEvent)] {
 
     //TODO 状态变量应该是在jobmanager中，可以共享，便于分布式。而普通的变量只在task中？
-    //这边只能获取state,无法获取keyedState，不是keyed，那么这个逻辑还可以吗？
+    //这边就是keyedState
     var orderState: ValueState[OrderEvent] = null
     var receiptState: ValueState[ReceiptEvent] = null
 
@@ -84,6 +84,7 @@ object OrderConnectAndCheck {
 
       val valueStateDesc = new ValueStateDescriptor[OrderEvent]("orderState", createTypeInformation[OrderEvent])
       valueStateDesc.enableTimeToLive(stateTtl)
+      //这边获取的就是KeyedState
       orderState = getRuntimeContext.getState(valueStateDesc)
 
       val receiptStateDesc = new ValueStateDescriptor[ReceiptEvent]("receiptState", createTypeInformation[ReceiptEvent])
