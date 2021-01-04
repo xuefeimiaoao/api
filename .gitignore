@@ -1,0 +1,11 @@
+# IntelliJ IDEA config
+.idea/
+target/
+*.iml
+*.log
+package.json
+*/logs
+/logs/
+*/target/
+*/*.iml
+*/*.pyc
