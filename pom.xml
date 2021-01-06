@@ -12,6 +12,7 @@
         <module>spark</module>
         <module>flink</module>
         <module>scala</module>
+        <module>nosql</module>
     </modules>
 
     <properties>

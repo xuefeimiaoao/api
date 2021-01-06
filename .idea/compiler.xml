@@ -9,6 +9,7 @@
         <module name="spark" />
         <module name="scala" />
         <module name="flink" />
+        <module name="Middleware" />
       </profile>
     </annotationProcessing>
   </component>
