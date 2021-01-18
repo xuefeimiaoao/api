@@ -17,10 +17,18 @@
 
     <properties>
         <scala.binary.version>2.11</scala.binary.version>
+        <scala.test.version>3.0.3</scala.test.version>
         <flink.version>1.10.0</flink.version>
         <statefun.flink.common>2.2.0</statefun.flink.common>
         <spark.version>2.4.3</spark.version>
+        <hadoop.version>2.7.0</hadoop.version>
         <junit.version>4.12</junit.version>
+        <jackson.version>2.9.9</jackson.version>
+        <akka.version>2.5.32</akka.version>
+        <apache.httpClient.version>4.5.6</apache.httpClient.version>
+        <slf4j.version>1.8.0-beta4</slf4j.version>
+        <commons.lang3.version>3.3.2</commons.lang3.version>
+        <CodeCacheSize>512m</CodeCacheSize>
     </properties>
 
     <profiles>
@@ -72,5 +80,17 @@
     system
     从参与度来说，也provided相同，不过被依赖项不会从maven仓库抓，而是从本地文件系统拿，一定需要配合systemPath属性使用。-->
 
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.scalatest</groupId>
+                <artifactId>scalatest-maven-plugin</artifactId>
+                <configuration>
+                    <!-- Specially disable assertions since some Hive tests fail them -->
+                    <argLine>-da -Xmx3g -XX:ReservedCodeCacheSize=${CodeCacheSize}</argLine>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>
