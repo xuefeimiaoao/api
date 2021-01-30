@@ -19,6 +19,7 @@
   </properties>
 
   <dependencies>
+
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
@@ -30,7 +31,16 @@
           <groupId>org.rocksdb</groupId>
           <artifactId>rocksdbjni</artifactId>
           <version>6.11.4</version>
+          <!--<scope>${profile.scope}</scope>-->
       </dependency>
+      <!-- https://mvnrepository.com/artifact/commons-collections/commons-collections -->
+      <dependency>
+          <groupId>commons-collections</groupId>
+          <artifactId>commons-collections</artifactId>
+          <version>3.2.2</version>
+          <!--<scope>${profile.scope}</scope>-->
+      </dependency>
+
 
   </dependencies>
 
@@ -76,6 +86,77 @@
           <artifactId>maven-project-info-reports-plugin</artifactId>
           <version>3.0.0</version>
         </plugin>
+          <!--<plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-shade-plugin</artifactId>
+              <version>3.2.1</version>
+              <configuration>
+                  <createDependencyReducedPom>false</createDependencyReducedPom>
+              </configuration>
+              <executions>
+                  <execution>
+                      <phase>package</phase>
+                      <goals>
+                          <goal>shade</goal>
+                      </goals>
+                      <configuration>
+                          <relocations>
+                              <relocation>
+                                  <pattern>org.rocksdb</pattern>
+                                  <shadedPattern>shade.org.rocksdb</shadedPattern>
+                              </relocation>
+                              <relocation>
+                                  <pattern>org.apache.commons.collections</pattern>
+                                  <shadedPattern>shade.org.apache.commons.collections</shadedPattern>
+                              </relocation>
+                          </relocations>
+                          <transformers>
+                              <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer" />
+                          </transformers>
+                      </configuration>
+                  </execution>
+              </executions>
+
+          </plugin>-->
+
+          <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-assembly-plugin</artifactId>
+              <version>2.4.1</version>
+              <configuration>
+                  <!-- get all project dependencies -->
+                  <descriptorRefs>
+                      <descriptorRef>jar-with-dependencies</descriptorRef>
+                  </descriptorRefs>
+
+                  <descriptors>
+                      <descriptor>src/main/assembly/assembly.xml</descriptor>
+                  </descriptors>
+                  <!-- MainClass in mainfest make a executable jar -->
+
+                  <archive>
+                      <manifest>
+                          <addClasspath>true</addClasspath>
+                          <classpathPrefix>lib/</classpathPrefix>
+                          <mainClass>tianz.bd.api.nosql.rocksdb.MultiProcessRead</mainClass>
+                      </manifest>
+                  </archive>
+
+              </configuration>
+              <executions>
+                  <!-- 配置执行器 -->
+                  <execution>
+                      <id>make-assembly</id>
+                      <!-- 绑定到package命令的生命周期上 -->
+                      <phase>package</phase>
+                      <goals>
+                          <!-- 只运行一次 -->
+                          <goal>single</goal>
+                      </goals>
+                  </execution>
+              </executions>
+          </plugin>
+
       </plugins>
     </pluginManagement>
   </build>

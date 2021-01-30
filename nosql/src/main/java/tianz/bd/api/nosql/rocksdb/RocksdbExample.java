@@ -36,7 +36,7 @@ public class RocksdbExample {
         RocksDB rdb = null;
         try {
             canonicalPath = new File("").getCanonicalPath();
-            rdb = RocksDB.open(dbOpt, canonicalPath + "\\nosql\\rocksdb");
+            rdb = RocksDB.open(dbOpt, canonicalPath + "\\nosql\\src\\main\\rocksdb");
         } catch (IOException e) {
             e.printStackTrace();
         } catch (RocksDBException e) {
