@@ -3,6 +3,7 @@ package tianz.bd.api.nosql.rocksdb;
 import org.apache.commons.collections.CollectionUtils;
 import org.rocksdb.RocksDBException;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.locks.Condition;
@@ -43,19 +44,19 @@ public class RocksDBConnectionPool {
         this.activeConnectionPool = new ArrayList<>();
     }
 
-    public AbstractRocksDBConnection getConnection() throws RocksDBException {
+    public AbstractRocksDBConnection getConnection() throws RocksDBException, InterruptedException {
         return getConnection(null, Mode.READ_ONLY);
     }
 
-    public AbstractRocksDBConnection getConnection(String dbPath) throws RocksDBException {
+    public AbstractRocksDBConnection getConnection(String dbPath) throws RocksDBException, InterruptedException {
         return getConnection(dbPath, Mode.READ_ONLY);
     }
 
-    public AbstractRocksDBConnection getConnection(Mode mode) throws RocksDBException {
+    public AbstractRocksDBConnection getConnection(Mode mode) throws RocksDBException, InterruptedException {
         return getConnection(null, mode);
     }
 
-    public AbstractRocksDBConnection getConnection(String dbPath, Mode mode) throws RocksDBException {
+    public AbstractRocksDBConnection getConnection(String dbPath, Mode mode) throws RocksDBException, InterruptedException {
 
         //TODO 连接池根据dbPath分类，每个dbPath可以选择维护一个连接池；连接池中，只读模式可以创建多个连接，写模式只需要一个连接。
         switch (mode) {
@@ -76,10 +77,9 @@ public class RocksDBConnectionPool {
         }
     }
 
-    private AbstractRocksDBConnection getReadOnlyConnection(String dbPath) throws RocksDBException {
+    private AbstractRocksDBConnection getReadOnlyConnection(String dbPath) throws RocksDBException, InterruptedException {
         try {
             lock.lock();
-            Boolean wait = false;
 
             //TODO idle超时
 
@@ -98,17 +98,7 @@ public class RocksDBConnectionPool {
                 }
 
                 //wait
-                try {
-                    notEmpty.await();
-                } catch (InterruptedException e) {
-                    wait = true;
-                    break;
-                }
-
-            }
-
-            if (wait) {
-                return null;
+                notEmpty.await();
             }
 
             RocksDBProxy rocksDBProxy = idledConnectionPool.get(0);
@@ -129,6 +119,9 @@ public class RocksDBConnectionPool {
             } else {
                 rocksDBProxy.getRealDB().close();
             }
+        } catch (IOException e) {
+            //TODO 怎么处理IO异常？这是由于实现了Closable接口抛出的异常。
+            e.printStackTrace();
         } finally {
             lock.unlock();
         }

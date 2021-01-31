@@ -3,6 +3,7 @@ package tianz.bd.api.nosql.rocksdb;
 import org.rocksdb.ColumnFamilyHandle;
 import org.rocksdb.RocksDBException;
 
+import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -12,7 +13,7 @@ import java.io.UnsupportedEncodingException;
  * @Date: 2021/1/28 20:02
  * @Description:
  */
-public interface AbstractRocksDBConnection {
+public interface AbstractRocksDBConnection extends Closeable {
 
     public Long connectionTimeout = 10000L;
     public Integer maxIdledConn = 10;
@@ -24,5 +25,5 @@ public interface AbstractRocksDBConnection {
 
     public void put(String inputKey, String inputValue) throws RocksDBException, UnsupportedEncodingException;
 
-    public void close();
+    public void close() throws IOException;
 }

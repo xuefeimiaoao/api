@@ -5,6 +5,7 @@ import org.rocksdb.Options;
 import org.rocksdb.RocksDB;
 import org.rocksdb.RocksDBException;
 
+import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -114,7 +115,7 @@ public class RocksDBConnection implements AbstractRocksDBConnection {
     }
 
     @Override
-    public void close() {
+    public void close() throws IOException {
         if (this.realConn != null) {
             this.realConn.close();
         }

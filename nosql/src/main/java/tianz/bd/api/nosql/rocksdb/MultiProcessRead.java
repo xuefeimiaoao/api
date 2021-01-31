@@ -2,6 +2,7 @@ package tianz.bd.api.nosql.rocksdb;
 
 import org.rocksdb.RocksDBException;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -31,12 +32,11 @@ public class MultiProcessRead {
         }
 
         if ("write".equalsIgnoreCase(mode)) {
-            AbstractRocksDBConnection connection;
-            try {
-                connection = pool.getConnection(Mode.WRITE);
+            try (AbstractRocksDBConnection connection = pool.getConnection(Mode.WRITE)) {
                 connection.put(key, value);
-                connection.close();
-            } catch (RocksDBException | UnsupportedEncodingException e) {
+            } catch (RocksDBException | UnsupportedEncodingException | InterruptedException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
                 e.printStackTrace();
             }
         }
@@ -59,12 +59,12 @@ public class MultiProcessRead {
     }
 
     public static void print(String path, String key) {
-        try {
-            AbstractRocksDBConnection connection = pool.getConnection(path);
+        try (AbstractRocksDBConnection connection = pool.getConnection(path)) {
             String read = connection.read(key);
             System.out.println(read);
-            connection.close();
-        } catch (RocksDBException | UnsupportedEncodingException e) {
+        } catch (RocksDBException | UnsupportedEncodingException | InterruptedException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }

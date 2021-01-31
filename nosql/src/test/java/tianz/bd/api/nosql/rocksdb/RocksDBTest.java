@@ -19,6 +19,11 @@ import java.util.concurrent.Executors;
 public class RocksDBTest {
 
     SimpleDateFormat sf = new SimpleDateFormat();
+    static RocksDBConnectionPool pool = new RocksDBConnectionPool();
+    ExecutorService executorService = Executors.newFixedThreadPool(50);
+    public static String path = null;
+    public static String key = "testKey";
+    public static String value = "hello";
 
     @Test
     public void test() {
@@ -53,7 +58,7 @@ public class RocksDBTest {
         }
     }
 
-    public String getDefaultPath() {
+    public static String getDefaultPath() {
         String canonicalPath = "";
         try {
             canonicalPath = new File("").getCanonicalPath();
@@ -64,18 +69,48 @@ public class RocksDBTest {
     }
 
     @Test
-    public void testReadPool() {
-        RocksDBConnectionPool pool = new RocksDBConnectionPool();
-        try {
-            AbstractRocksDBConnection writableConn = pool.getConnection(getDefaultPath(), Mode.WRITE);
-            writableConn.put(getDefaultPath(), "RocksDB");
-            writableConn.close();
+    public void testWritePool() {
+        try (AbstractRocksDBConnection connection = pool.getConnection(Mode.WRITE)) {
+            connection.put(key, value);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
-            AbstractRocksDBConnection connection = pool.getConnection(getDefaultPath());
-//            connection.put("key1", "value1");
-            System.out.println(connection.read("hello"));
-            connection.close();
-        } catch (RocksDBException | UnsupportedEncodingException e) {
+    @Test
+    public void testKeepWritePool() {
+        try (AbstractRocksDBConnection connection = pool.getConnection(Mode.WRITE)) {
+            connection.put(key, value);
+            Thread.sleep(10000);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+    public void testReadPool() {
+        ExecutorService executorService = Executors.newFixedThreadPool(50);
+        while (true) {
+            executorService.submit(new Runnable() {
+                @Override
+                public void run() {
+                    print(getDefaultPath(), key);
+                }
+            });
+            try {
+                Thread.sleep(50);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+
+    public static void print(String path, String key) {
+        try (AbstractRocksDBConnection connection = pool.getConnection(path)) {
+            String read = connection.read(key);
+            System.out.println(read);
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
