@@ -5,6 +5,7 @@ import org.rocksdb.RocksDBException;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 
 /**
  * @Author: Miaoxf
@@ -13,26 +14,15 @@ import java.io.IOException;
  */
 public interface AbstractRocksDBConnection {
 
-    public static final String defaultPath = getDefaultPath();
     public Long connectionTimeout = 10000L;
     public Integer maxIdledConn = 10;
     public Integer maxActiveConn = 10;
 
-    public static String getDefaultPath() {
-        String canonicalPath = "";
-        try {
-            canonicalPath = new File("").getCanonicalPath();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return canonicalPath + "\\metadata";
-    }
+    public String read(String inputKey) throws RocksDBException, UnsupportedEncodingException;
 
-    public String read(String inputKey) throws RocksDBException;
+    public void put(ColumnFamilyHandle cfHandle, String inputKey, String inputValue) throws RocksDBException, UnsupportedEncodingException;
 
-    public void put(ColumnFamilyHandle cfHandle, String inputKey, String inputValue) throws RocksDBException;
-
-    public void put(String inputKey, String inputValue) throws RocksDBException;
+    public void put(String inputKey, String inputValue) throws RocksDBException, UnsupportedEncodingException;
 
     public void close();
 }

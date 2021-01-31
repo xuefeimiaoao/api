@@ -94,7 +94,7 @@ public class RocksDBConnectionPool {
                         rocksDBProxy = new RocksDBProxy(new RocksDBConnection(), this);
                     }
                     activeConnectionPool.add(rocksDBProxy);
-                    return rocksDBProxy;
+                    return rocksDBProxy.getProxyDB();
                 }
 
                 //wait
@@ -113,7 +113,7 @@ public class RocksDBConnectionPool {
 
             RocksDBProxy rocksDBProxy = idledConnectionPool.get(0);
             idledConnectionPool.remove(0);
-            return rocksDBProxy;
+            return rocksDBProxy.getProxyDB();
         } finally {
             lock.unlock();
         }

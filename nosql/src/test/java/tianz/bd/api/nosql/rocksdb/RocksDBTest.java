@@ -5,6 +5,7 @@ import org.rocksdb.RocksDBException;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.concurrent.ExecutorService;
@@ -74,7 +75,7 @@ public class RocksDBTest {
 //            connection.put("key1", "value1");
             System.out.println(connection.read("hello"));
             connection.close();
-        } catch (RocksDBException e) {
+        } catch (RocksDBException | UnsupportedEncodingException e) {
             e.printStackTrace();
         }
     }
